@@ -1,12 +1,3 @@
-let server;
+import { SharkApi } from './core/index.js';
 
-export function express(serverExpress) {
-  server = serverExpress;
-}
-
-export function sequelizeModel(model) {
-  server.get(`/${model.tableName}`, async (req, res) => {
-    let rows = await model.findAll();
-    res.send(rows);
-  });
-}
+export { SharkApi };
