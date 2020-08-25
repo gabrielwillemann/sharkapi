@@ -1,0 +1,42 @@
+- Notes
+  - Progressive framework/library for backend
+  - Shark-api allow change default method for execute query
+  - GraphQL with socket
+- Configuration In development
+  - (Required) Choice request parsed: REST API or GraphQL
+  - (Required) Choice ORM: Sequelize, TypeORM or MongoDB
+  - (Optional) Choice routes (index, show, create, update, destroy)
+    - Attention with GraphQL
+  - (Optional) Set visible or hidden fields
+  - (Optional) Set custom filters
+    - According to the chosen ORM
+  - (Optional) Set custom sorters
+  - (Optional) Set default pagination
+  - (Optional) Hooks?
+    - What it will work? I need to create prototype, after I'll
+    - Hook by all requests, hook by entity, hook by entity and method
+    - Purposes: For permissions, or tenant architecture
+- Structure
+  - Core
+    - Load configurations
+    - Start server configured
+    - Intercept comunication between Server and ORM Adapters
+  - Server
+    - Request data to ORM Adapters
+      - This comunication will intercept by core, because the library have configurations
+    - Parse requests and responses
+    - REST API Server
+      - Create routes
+      - Parameters
+        - sort: Attention with custom sorts (maybe in others tables)
+        - filter: Attention with custom filters (maybe with others operators)
+        - page: Attention with quantity of pages (first, next, prior, last)
+        - include: Attention with deep relationship
+    - GraphQL Server
+      - Create types, resolvers for queries and mutations
+      - Attention: Joins
+  - ORM Adapters
+    - Is a layer that get metadata of ORM
+    - Create a adapter for each ORM: Sequelize, TypeORM and MongoDB
+    - All adapters will implement the same API/Interface
+    - Implement all default actions (index, show, create, update and destroy) used by routes and resolvers

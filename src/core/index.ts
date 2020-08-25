@@ -1,72 +1,5 @@
-abstract class ServerBase {
-  express;
-  core: SharkApi;
-
-  constructor(core: SharkApi) {
-    this.core = core;
-  }
-
-  createResources(): void {}
-  createIndex() {}
-}
-
-class ServerRestApi extends ServerBase {
-  createResources() {
-    this.createIndex();
-  }
-
-  createIndex() {
-    for (let entity of this.core.entities) {
-
-      this.express.get(`/${entity.name()}`, async (req, res) => {
-        let rows = await entity.index();
-        res.send(rows);
-      });
-    }
-  }
-}
-
-class ServerGraphQl extends ServerBase {}
-
-abstract class EntityBase {
-  core: SharkApi;
-  source;
-
-  constructor(core: SharkApi) {
-    this.core = core;
-  }
-
-  name(): string {
-    return null;
-  }
-  properties(): Array<string> {
-    return null;
-  }
-  relationships(): Array<string> {
-    return null;
-  }
-  async index() {
-    return null;
-  }
-  async create() {
-    return null;
-  }
-  async update() {
-    return null;
-  }
-  async destroy() {
-    return null;
-  }
-}
-
-class EntitySequelize extends EntityBase {
-  name(): string {
-    return this.source.tableName;
-  }
-  async index() {
-    return await this.source.findAll();
-  }
-}
+import { ServerBase, ServerRestApi } from '../server/index.js';
+import { EntityBase, EntitySequelize, EntityOptions } from '../orm/index.js';
 
 export class SharkApi {
   server: ServerBase;
@@ -77,18 +10,24 @@ export class SharkApi {
   }
 
   restApiServer(express): ServerRestApi {
-    this.server = new ServerRestApi(this);
-    this.server.express = express;
-    return this.server;
+    let restServer: ServerRestApi = new ServerRestApi();
+    restServer.core = this;
+    restServer.express = express;
+    this.server = restServer;
+    return restServer;
   }
 
-  entitySequelize(entity: object): EntitySequelize {
-    let ent = new EntitySequelize(this);
+  entitySequelize(entity, options?: EntityOptions): EntitySequelize {
+    let ent = new EntitySequelize();
+    ent.core = this;
     ent.source = entity;
+    ent.options = options;
     this.entities.push(ent);
     return ent;
   }
+
   createResources(): void {
     this.server.createResources();
   }
 }
+
