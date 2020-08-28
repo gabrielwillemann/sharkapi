@@ -3,11 +3,16 @@ import { SharkApi } from '../core/index.js';
 export interface EntityBase {
   core: SharkApi;
   options?: EntityOptions;
-  name(): string;
-  properties(): Array<string>;
+  name: string;
+  properties: Array<string>;
+  relationships: Array<Relationship>;
+  sortableProperties: Array<string>;
+
+  loadSource(): void;
+
   isSortable(property: string): boolean;
-  relationships(): Array<Relation>;
-  isRelationship(relationship: string): boolean;
+  findRelationshipSources(relationships: Array<Relationship>, source?);
+
   index(params);
   create();
   update();
@@ -18,66 +23,98 @@ export interface EntityOptions {
   sort?: Array<string>;
 }
 
-export interface Relation {
+export interface Relationship {
   name: string;
-  source: any;
+  source?: any;
+  children?: Array<Relationship>;
+}
+
+export interface IndexArguments {
+  sort: Array<Array<string>>;
+  relationships: Array<Relationship>;
+  filters;
 }
 
 export class EntitySequelize implements EntityBase {
   source;
   core: SharkApi;
   options?: EntityOptions;
+  name: string;
+  properties: Array<string>;
+  relationships: Array<Relationship>;
+  sortableProperties: Array<string>;
 
-  name(): string {
-    return this.source.tableName;
+  loadSource(): void {
+    this.loadName();
+    this.loadProperties();
+    this.loadSortableProperties();
   }
 
-  properties(): Array<string> {
-    let result: Array<string> = [];
+  loadName(): void {
+    this.name = this.source.tableName;
+  }
+
+  loadProperties(): void {
+    this.properties = [];
     for (let property in this.source.tableAttributes) {
-      result.push(property);
+      this.properties.push(property);
     }
-    return result;
   }
 
-  sortableProperties(): Array<string> {
+  loadSortableProperties(): void {
+    this.sortableProperties = [];
     if (this.options?.sort?.length > 0) {
-      return this.options.sort;
+      this.sortableProperties = this.options.sort;
+    } else {
+      this.sortableProperties = this.properties;
     }
-    return this.properties();
   }
 
   isSortable(property: string): boolean {
-    let field = this.sortableProperties().find((prop) => prop == property);
+    let field = this.sortableProperties.find((prop) => prop == property);
     return !!field;
   }
 
-  relationships(): Array<Relation> {
-    let result: Array<Relation> = [];
-    for (let key in this.source.associations) {
-      let relation = { name: key, source: this.source.associations[key].target };
-      result.push(relation);
+  findRelationshipSources(relationships: Array<Relationship>, source?) {
+    source = source || this.source;
+    relationships = relationships || [];
+    for (let relationship of relationships) {
+      for (let name in source.associations) {
+        if (name.toLowerCase() == relationship.name.toLowerCase()) {
+          relationship.source = source.associations[name].target;
+          break;
+        }
+      }
+      if (!relationship.source) {
+        throw `relationship ${relationship.name} not found!`;
+      }
+      this.findRelationshipSources(relationship.children, relationship.source);
+    }
+  }
+
+  factoryInclude(relationships: Array<Relationship>): Array<any> {
+    relationships = relationships || [];
+    return relationships.map((relationship) => ({
+      model: relationship.source,
+      include: this.factoryInclude(relationship.children),
+    }));
+  }
+
+  factoryWhere(filters) {
+    let result = {};
+    for (let key in filters) {
+      if (filters[key]) {
+        result[key] = filters[key];
+      }
     }
     return result;
   }
 
-  isRelationship(relationship: string): boolean {
-    let r = this.relationships().find((r) => r.name == relationship);
-    return !!r;
-  }
-
-  factoryInclude(relationships) {
-    if (relationships) {
-      return relationships.map((r) => ({ model: r.source }));
-    } else {
-      return [];
-    }
-  }
-
-  async index({ sort, relationships }) {
+  async index({ sort, relationships, filters }: IndexArguments) {
     return await this.source.findAll({
       order: sort,
       include: this.factoryInclude(relationships),
+      where: this.factoryWhere(filters),
     });
   }
 

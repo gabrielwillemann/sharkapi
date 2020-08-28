@@ -22,6 +22,7 @@ export class SharkApi {
     ent.core = this;
     ent.source = entity;
     ent.options = options;
+    ent.loadSource();
     this.entities.push(ent);
     return ent;
   }
@@ -30,4 +31,3 @@ export class SharkApi {
     this.server.createResources();
   }
 }
-

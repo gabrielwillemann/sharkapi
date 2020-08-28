@@ -1,4 +1,5 @@
 import { SharkApi } from '../core/index.js';
+import { Relationship } from '../orm/index.js';
 
 export interface ServerBase {
   core: SharkApi;
@@ -15,11 +16,12 @@ export class ServerRestApi implements ServerBase {
 
   createIndex() {
     for (let entity of this.core.entities) {
-      this.express.get(`/${entity.name()}`, async (req, res) => {
+      this.express.get(`/${entity.name}`, async (req, res) => {
         try {
+          let relationships = this.parseRelationship(entity, req.query.include);
           let sort = this.parseSort(entity, req.query.sort);
-          let include = this.parseInclude(entity, req.query.include);
-          let rows = await entity.index({ sort, relationships: include });
+          let filters = req.query.filter;
+          let rows = await entity.index({ sort, relationships, filters });
           res.send(rows);
         } catch (error) {
           res.status(500).send({ error: error.message || error });
@@ -44,15 +46,31 @@ export class ServerRestApi implements ServerBase {
     return result;
   }
 
-  parseInclude(entity, query: string): Array<string> {
-    let result: Array<string> = [];
-    let relations = query?.split(',') || [];
-    for (let relation of relations) {
-      if (relation.length > 0) {
-        if (entity.isRelationship(relation)) {
-          result.push(relation);
-        } else {
-          throw `'${relation}' is invalid relationship!`;
+  parseRelationship(entity, query: string): Array<Relationship> {
+    if (!query) return null;
+    let queryArray = query.split(',').map((i) => i.split('.'));
+    let queryObj = this.summarizeQueryInclude(queryArray);
+    let relationships = this.createRelationships(queryObj);
+    entity.findRelationshipSources(relationships);
+    return relationships;
+  }
+
+  createRelationships(query: any): Array<Relationship> {
+    let result = [];
+    for (let key in query) {
+      result.push({ name: key, children: this.createRelationships(query[key]) });
+    }
+    return result;
+  }
+
+  summarizeQueryInclude(include: Array<Array<string>>): any {
+    let result = {};
+    for (let entities of include) {
+      let current = result;
+      for (let entity of entities) {
+        if (entity) {
+          current[entity] = current[entity] || {};
+          current = current[entity];
         }
       }
     }
@@ -60,4 +78,4 @@ export class ServerRestApi implements ServerBase {
   }
 }
 
-// class ServerGraphQl extends ServerBase {}
+// class ServerGraphQl implements ServerBase { }

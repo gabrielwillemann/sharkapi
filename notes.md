@@ -28,10 +28,11 @@
     - REST API Server
       - Create routes
       - Parameters
-        - sort: Attention with custom sorts (maybe in others tables)
+        - OK sort
+          - PENDING Attention with custom sorts, maybe in others tables
         - filter: Attention with custom filters (maybe with others operators)
         - page: Attention with quantity of pages (first, next, prior, last)
-        - include: Attention with deep relationship
+        - OK include: Attention with deep relationship
     - GraphQL Server
       - Create types, resolvers for queries and mutations
       - Attention: Joins
@@ -40,3 +41,5 @@
     - Create a adapter for each ORM: Sequelize, TypeORM and MongoDB
     - All adapters will implement the same API/Interface
     - Implement all default actions (index, show, create, update and destroy) used by routes and resolvers
+- Convert my personal projects
+  - https://www.npmjs.com/package/change-case
