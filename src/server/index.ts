@@ -1,5 +1,5 @@
 import { SharkApi } from '../core/index';
-import { Relationship, Sort, IndexRequest } from '../orm/index';
+import { Relationship, Sort, IndexRequest, Page } from '../orm/index';
 
 export interface ServerBase {
   core: SharkApi;
@@ -22,6 +22,7 @@ export class ServerRestApi implements ServerBase {
           this.parseRelationship(indexReq, req.query.include);
           this.parseSort(indexReq, req.query.sort);
           this.parseFilter(indexReq, req.query.filter);
+          this.parsePage(indexReq, req.query.page);
           let rows = await indexReq.run();
           res.send(rows);
         } catch (error) {
@@ -32,7 +33,10 @@ export class ServerRestApi implements ServerBase {
   }
 
   parseSort(indexReq: IndexRequest, query: string): void {
-    let fields = query?.split(',') || [];
+    if (!query) return null;
+    if (typeof query != 'string') throw 'Invalid sort!';
+
+    let fields = query?.split(',');
     for (let field of fields) {
       if (field.length > 0) {
         let sort: Sort;
@@ -66,13 +70,14 @@ export class ServerRestApi implements ServerBase {
       } else if (indexReq.entity.isFilterable(filter.name)) {
         indexReq.filters.push(filter);
       } else {
-        throw `property '${key}' isn't sortable!`;
+        throw `property '${key}' isn't filterable!`;
       }
     }
   }
 
   parseRelationship(indexReq: IndexRequest, query: string): void {
     if (!query) return null;
+    if (typeof query != 'string') throw 'Invalid include!';
     let includes = query.split(',');
 
     let hooksRequested = [];
@@ -89,6 +94,26 @@ export class ServerRestApi implements ServerBase {
     let relationships = this.createRelationships(includesObj);
     indexReq.entity.findRelationshipSources(relationships);
     indexReq.relationships = [...relationships, ...hooksRequested];
+  }
+
+  parsePage(indexReq: IndexRequest, query: any): void {
+    if (query instanceof Array) return;
+    if (typeof query != 'object') return;
+
+    indexReq.page = indexReq.page || {};
+    indexReq.pageHooks = indexReq.pageHooks || [];
+    for (let key in query) {
+      let hooks = indexReq.entity.findHooks('page', key);
+      if (hooks.length > 0) {
+        indexReq.pageHooks.push({ name: key, value: query[key], hooks });
+      } else if (key == 'limit') {
+        indexReq.page.limit = parseInt(query[key]);
+      } else if (key == 'offset') {
+        indexReq.page.offset = parseInt(query[key]);
+      } else {
+        throw `property '${key}' isn't filterable!`;
+      }
+    }
   }
 
   createRelationships(query: any): Array<Relationship> {

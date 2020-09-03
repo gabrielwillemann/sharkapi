@@ -23,6 +23,8 @@ export interface IndexRequest {
   sort: Array<Sort | HookRequest>;
   filters: Array<Filter | HookRequest>;
   relationships: Array<Relationship | HookRequest>;
+  page: Page;
+  pageHooks: Array<HookRequest>;
 
   run();
 }
@@ -45,4 +47,9 @@ export interface Filter {
 export interface Sort {
   name: string;
   criteria: 'asc' | 'desc';
+}
+
+export interface Page {
+  limit?: number;
+  offset?: number;
 }

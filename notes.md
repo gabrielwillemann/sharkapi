@@ -5,17 +5,17 @@
 - Configuration In development
   - (Required) Choice request parsed: REST API or GraphQL
   - (Required) Choice ORM: Sequelize, TypeORM or MongoDB
-  - (Optional) Choice routes (index, show, create, update, destroy)
+  - PENDING Choice routes (index, show, create, update, destroy)
     - Attention with GraphQL
-  - (Optional) Set visible or hidden fields
-  - (Optional) Set custom filters
-    - According to the chosen ORM
-  - (Optional) Set custom sorters
-  - (Optional) Set default pagination
   - (Optional) Hooks?
-    - What it will work? I need to create prototype, after I'll
-    - Hook by all requests, hook by entity, hook by entity and method
-    - Purposes: For permissions, or tenant architecture
+    - Purposes:
+      - OK Set custom filters
+      - OK Set custom sorters
+      - OK Set custom relationships
+      - Set default pagination
+      - Set visible or hidden fields
+      - Local or global hooks
+      - For permissions, or tenant architecture
 - Structure
   - Core
     - Load configurations
@@ -28,11 +28,10 @@
     - REST API Server
       - Create routes
       - Parameters
-        - OK sort
-          - PENDING Attention with custom sorts, maybe in others tables
-        - filter: Attention with custom filters (maybe with others operators)
-        - page: Attention with quantity of pages (first, next, prior, last)
+        - OK sort: Attention with custom sorts, maybe in others tables
+        - OK filter: Attention with custom filters (maybe with others operators)
         - OK include: Attention with deep relationship
+        - PENDING page: Attention with quantity of pages (first, next, prior, last)
     - GraphQL Server
       - Create types, resolvers for queries and mutations
       - Attention: Joins

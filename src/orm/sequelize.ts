@@ -1,6 +1,6 @@
 import { SharkApi } from '../core/index';
 import { Hook, HookTrigger, HookRequest, hookMatch } from '../core/hooks';
-import { EntityBase, EntityOptions, IndexRequest, Relationship, Filter, Sort } from './index';
+import { EntityBase, EntityOptions, IndexRequest, Relationship, Filter, Sort, Page } from './index';
 
 export class SequelizeEntity implements EntityBase {
   source;
@@ -74,6 +74,8 @@ export class SequelizeIndexRequest implements IndexRequest {
   sort: Array<Sort | HookRequest>;
   filters: Array<Filter | HookRequest>;
   relationships: Array<Relationship | HookRequest>;
+  page: Page;
+  pageHooks: Array<HookRequest>;
 
   constructor() {
     this.sort = [];
@@ -83,7 +85,6 @@ export class SequelizeIndexRequest implements IndexRequest {
 
   factoryOrder(context: any): any {
     if (!this.sort) return undefined;
-
     context.order = context.order || [];
     for (let obj of this.sort) {
       if (obj['hooks']) {
@@ -121,7 +122,6 @@ export class SequelizeIndexRequest implements IndexRequest {
 
   factoryWhere(context: any): any {
     if (!this.filters) return undefined;
-
     context.where = context.where || {};
     for (let obj of this.filters) {
       if (obj['hooks']) {
@@ -133,7 +133,17 @@ export class SequelizeIndexRequest implements IndexRequest {
         context.where[filter.name] = filter.value;
       }
     }
+    return context;
+  }
 
+  factoryPage(context: any): any {
+    if (this.page) {
+      context.limit = this.page.limit;
+      context.offset = this.page.offset;
+    }
+    for (let h of this.pageHooks) {
+      context = this.callHookRequested(h, context) || context;
+    }
     return context;
   }
 
@@ -155,10 +165,11 @@ export class SequelizeIndexRequest implements IndexRequest {
 
   async run() {
     let query;
-    let context = {};
+    let context = { subQuery: false };
     context = this.factoryInclude(context) || context;
     context = this.factoryWhere(context) || context;
     context = this.factoryOrder(context) || context;
+    context = this.factoryPage(context) || context;
 
     context = this.callHook('index-before', context);
     query = await this.entity.source.findAll(context);
