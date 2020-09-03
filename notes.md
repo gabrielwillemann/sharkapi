@@ -36,6 +36,8 @@
     - GraphQL Server
       - Create types, resolvers for queries and mutations
       - Attention: Joins
+      - https://www.apollographql.com/blog/designing-graphql-mutations-e09de826ed97/
+      - https://graphql.org/graphql-js/mutations-and-input-types/
   - ORM Adapters
     - Is a layer that get metadata of ORM
     - Create a adapter for each ORM: Sequelize, TypeORM and MongoDB

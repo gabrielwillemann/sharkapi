@@ -1,12 +1,16 @@
-import { ServerBase, ServerRestApi } from '../server/index.js';
-import { EntityBase, EntitySequelize, EntityOptions } from '../orm/index.js';
+import { ServerBase, ServerRestApi } from '../server/index';
+import { EntityBase, EntityOptions } from '../orm/index';
+import { SequelizeEntity } from '../orm/sequelize';
+import { Hook } from './hooks';
 
 export class SharkApi {
   server: ServerBase;
   entities: Array<EntityBase>;
+  hooks: Array<Hook>;
 
   constructor() {
     this.entities = [];
+    this.hooks = [];
   }
 
   restApiServer(express): ServerRestApi {
@@ -17,8 +21,8 @@ export class SharkApi {
     return restServer;
   }
 
-  entitySequelize(entity, options?: EntityOptions): EntitySequelize {
-    let ent = new EntitySequelize();
+  entitySequelize(entity, options?: EntityOptions): SequelizeEntity {
+    let ent = new SequelizeEntity();
     ent.core = this;
     ent.source = entity;
     ent.options = options;
