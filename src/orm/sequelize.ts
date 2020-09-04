@@ -1,6 +1,6 @@
 import { SharkApi } from '../core/index';
 import { Hook, HookTrigger, HookRequest, hookMatch } from '../core/hooks';
-import { EntityBase, EntityOptions, IndexRequest, Relationship, Filter, Sort, Page } from './index';
+import { EntityBase, EntityOptions, IndexAction, ShowAction, Relationship, Filter, Sort, Page } from './index';
 
 export class SequelizeEntity implements EntityBase {
   source;
@@ -53,23 +53,28 @@ export class SequelizeEntity implements EntityBase {
   }
 
   getHooks(): Array<Hook> {
-    this.options = this.options || {};
-    this.options.hooks = this.options.hooks || [];
-    return this.options.hooks;
+    let hooks = this.options?.hooks || [];
+    return [...this.core.getHooks(), ...hooks];
   }
 
   findHooks(trigger: HookTrigger, name: string): Array<Hook> {
     return this.getHooks().filter((hook) => hookMatch(hook, trigger, name));
   }
 
-  newIndexRequest(): SequelizeIndexRequest {
-    let req = new SequelizeIndexRequest();
+  newIndexAction(): SequelizeIndexAction {
+    let req = new SequelizeIndexAction();
+    req.entity = this;
+    return req;
+  }
+
+  newShowAction(): ShowAction {
+    let req = new SequelizeShowAction();
     req.entity = this;
     return req;
   }
 }
 
-export class SequelizeIndexRequest implements IndexRequest {
+export class SequelizeIndexAction implements IndexAction {
   entity: SequelizeEntity;
   sort: Array<Sort | HookRequest>;
   filters: Array<Filter | HookRequest>;
@@ -141,6 +146,7 @@ export class SequelizeIndexRequest implements IndexRequest {
       context.limit = this.page.limit;
       context.offset = this.page.offset;
     }
+    this.pageHooks = this.pageHooks || [];
     for (let h of this.pageHooks) {
       context = this.callHookRequested(h, context) || context;
     }
@@ -149,7 +155,9 @@ export class SequelizeIndexRequest implements IndexRequest {
 
   callHookRequested(hookReq, context: any): any {
     for (let hook of hookReq.hooks) {
-      context = hook.fn({ context, name: hookReq.name, value: hookReq.value }) || context;
+      if (hook.fn && typeof hook.fn == 'function') {
+        context = hook.fn({ context, name: hookReq.name, value: hookReq.value }) || context;
+      }
     }
     return context;
   }
@@ -157,13 +165,15 @@ export class SequelizeIndexRequest implements IndexRequest {
   callHook(trigger: HookTrigger, context: any): any {
     for (let hook of this.entity.getHooks()) {
       if (hook.trigger == trigger) {
-        context = hook.fn({ context }) || context;
+        if (hook.fn && typeof hook.fn == 'function') {
+          context = hook.fn({ context }) || context;
+        }
       }
     }
     return context;
   }
 
-  async run() {
+  async run(): Promise<any> {
     let query;
     let context = { subQuery: false };
     context = this.factoryInclude(context) || context;
@@ -172,8 +182,14 @@ export class SequelizeIndexRequest implements IndexRequest {
     context = this.factoryPage(context) || context;
 
     context = this.callHook('index-before', context);
-    query = await this.entity.source.findAll(context);
+    query = await this.entity.source.findAndCountAll(context);
     query = this.callHook('index-after', query);
     return query;
   }
+}
+
+export class SequelizeShowAction implements ShowAction {
+  entity: EntityBase;
+  relationships: Array<Relationship | HookRequest>;
+  run(): any {}
 }

@@ -15,10 +15,11 @@ export interface EntityBase {
   findHooks(trigger: HookTrigger, match: string | RegExp): Array<Hook>;
   getHooks(): Array<Hook>;
 
-  newIndexRequest(): IndexRequest;
+  newIndexAction(): IndexAction;
+  newShowAction(): ShowAction;
 }
 
-export interface IndexRequest {
+export interface IndexAction {
   entity: EntityBase;
   sort: Array<Sort | HookRequest>;
   filters: Array<Filter | HookRequest>;
@@ -26,11 +27,20 @@ export interface IndexRequest {
   page: Page;
   pageHooks: Array<HookRequest>;
 
-  run();
+  run(): Promise<any>;
 }
+
+export interface ShowAction {
+  entity: EntityBase;
+  relationships: Array<Relationship | HookRequest>;
+  run(): Promise<any>;
+}
+
+export type Action = 'index' | 'show' | 'create' | 'update' | 'delete';
 
 export interface EntityOptions {
   hooks?: Array<Hook>;
+  actions: Array<Action>;
 }
 
 export interface Relationship {

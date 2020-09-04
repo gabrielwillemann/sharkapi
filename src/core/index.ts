@@ -6,11 +6,11 @@ import { Hook } from './hooks';
 export class SharkApi {
   server: ServerBase;
   entities: Array<EntityBase>;
-  hooks: Array<Hook>;
+  options: CoreOptions;
 
   constructor() {
     this.entities = [];
-    this.hooks = [];
+    this.options = {};
   }
 
   restApiServer(express): ServerRestApi {
@@ -34,4 +34,14 @@ export class SharkApi {
   createResources(): void {
     this.server.createResources();
   }
+
+  getHooks(): Array<Hook> {
+    this.options = this.options || {};
+    this.options.hooks = this.options.hooks || [];
+    return this.options.hooks;
+  }
+}
+
+export interface CoreOptions {
+  hooks?: Array<Hook>;
 }

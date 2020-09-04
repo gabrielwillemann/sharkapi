@@ -1,20 +1,28 @@
+- TO-DO list
+  - Routes
+    - OK Index
+    - Show
+    - Create
+    - Update
+    - Delete
+
+
+
+
 - Notes
   - Progressive framework/library for backend
-  - Shark-api allow change default method for execute query
-  - GraphQL with socket
 - Configuration In development
   - (Required) Choice request parsed: REST API or GraphQL
   - (Required) Choice ORM: Sequelize, TypeORM or MongoDB
-  - PENDING Choice routes (index, show, create, update, destroy)
-    - Attention with GraphQL
-  - (Optional) Hooks?
+  - Choice routes (index, show, create, update, delete)
+  - Hooks?
     - Purposes:
       - OK Set custom filters
       - OK Set custom sorters
       - OK Set custom relationships
-      - Set default pagination
-      - Set visible or hidden fields
-      - Local or global hooks
+      - OK Set default pagination
+      - OK Can change anything in query
+      - OK Local or global hooks
       - For permissions, or tenant architecture
 - Structure
   - Core
@@ -22,19 +30,16 @@
     - Start server configured
     - Intercept comunication between Server and ORM Adapters
   - Server
-    - Request data to ORM Adapters
-      - This comunication will intercept by core, because the library have configurations
     - Parse requests and responses
+    - Request data to ORM Adapters
+      - This communication will intercepted by core, because the each library have own configurations
     - REST API Server
       - Create routes
-      - Parameters
-        - OK sort: Attention with custom sorts, maybe in others tables
-        - OK filter: Attention with custom filters (maybe with others operators)
-        - OK include: Attention with deep relationship
-        - PENDING page: Attention with quantity of pages (first, next, prior, last)
+      - Parameters: sort, filter, include, page
     - GraphQL Server
       - Create types, resolvers for queries and mutations
       - Attention: Joins
+      - GraphQL with socket?
       - https://www.apollographql.com/blog/designing-graphql-mutations-e09de826ed97/
       - https://graphql.org/graphql-js/mutations-and-input-types/
   - ORM Adapters
@@ -42,5 +47,5 @@
     - Create a adapter for each ORM: Sequelize, TypeORM and MongoDB
     - All adapters will implement the same API/Interface
     - Implement all default actions (index, show, create, update and destroy) used by routes and resolvers
-- Convert my personal projects
+  - Convert my personal projects
   - https://www.npmjs.com/package/change-case
