@@ -1,6 +1,8 @@
 import { SharkApi } from '../core/index';
 import { Hook, HookTrigger, HookRequest } from '../core/hooks';
 
+export type Action = 'index' | 'show' | 'create' | 'update' | 'delete';
+
 export interface EntityBase {
   core: SharkApi;
   options?: EntityOptions;
@@ -17,6 +19,9 @@ export interface EntityBase {
 
   newIndexAction(): IndexAction;
   newShowAction(): ShowAction;
+  newCreateAction(): CreateAction;
+  newUpdateAction(): UpdateAction;
+  newDeleteAction(): DeleteAction;
 }
 
 export interface IndexAction {
@@ -33,14 +38,32 @@ export interface IndexAction {
 export interface ShowAction {
   entity: EntityBase;
   relationships: Array<Relationship | HookRequest>;
+  id: number | string;
   run(): Promise<any>;
 }
 
-export type Action = 'index' | 'show' | 'create' | 'update' | 'delete';
+export interface CreateAction {
+  entity: EntityBase;
+  data: any;
+  run(): Promise<any>;
+}
+
+export interface UpdateAction {
+  entity: EntityBase;
+  data: any;
+  id: number | string;
+  run(): Promise<any>;
+}
+
+export interface DeleteAction {
+  entity: EntityBase;
+  id: number | string;
+  run(): Promise<any>;
+}
 
 export interface EntityOptions {
   hooks?: Array<Hook>;
-  actions: Array<Action>;
+  actions?: Array<Action>;
 }
 
 export interface Relationship {

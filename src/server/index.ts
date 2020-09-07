@@ -1,5 +1,6 @@
 import { SharkApi } from '../core/index';
-import { EntityBase, Relationship, Sort, IndexAction, Page, ShowAction } from '../orm/index';
+import { Error } from '../core/error';
+import { EntityBase, Relationship, Sort, IndexAction, Filter, ShowAction } from '../orm/index';
 
 export interface ServerBase {
   core: SharkApi;
@@ -26,18 +27,56 @@ export class ServerRestApi implements ServerBase {
       try {
         let action = entity.newShowAction();
         this.parseRelationship(action, req.query.include);
-        // this.parseParamId(action, req.params.id);
+        action.id = req.params.id;
         let rows = await action.run();
         res.send(rows);
       } catch (error) {
-        res.status(500).send({ error: error.message || error });
+        this.catchError(error, res);
       }
     });
   }
 
-  actionCreate(entity: EntityBase): void {}
-  actionUpdate(entity: EntityBase): void {}
-  actionDelete(entity: EntityBase): void {}
+  actionCreate(entity: EntityBase): void {
+    this.express.post(`/${entity.name}`, async (req, res) => {
+      try {
+        let action = entity.newCreateAction();
+        action.data = req.body;
+        let row = await action.run();
+        res.send(row);
+      } catch (error) {
+        this.catchError(error, res);
+      }
+    });
+  }
+
+  actionUpdate(entity: EntityBase): void {
+    let fn = async (req, res) => {
+      try {
+        let action = entity.newUpdateAction();
+        action.id = req.params.id;
+        action.data = req.body;
+        let row = await action.run();
+        res.send(row);
+      } catch (error) {
+        this.catchError(error, res);
+      }
+    };
+    this.express.patch(`/${entity.name}/:id`, fn);
+    this.express.put(`/${entity.name}/:id`, fn);
+  }
+
+  actionDelete(entity: EntityBase): void {
+    this.express.delete(`/${entity.name}/:id`, async (req, res) => {
+      try {
+        let action = entity.newDeleteAction();
+        action.id = req.params.id;
+        let row = await action.run();
+        res.send(row);
+      } catch (error) {
+        this.catchError(error, res);
+      }
+    });
+  }
 
   actionIndex(entity: EntityBase): void {
     this.express.get(`/${entity.name}`, async (req, res) => {
@@ -50,14 +89,14 @@ export class ServerRestApi implements ServerBase {
         let rows = await action.run();
         res.send(rows);
       } catch (error) {
-        res.status(500).send({ error: error.message || error });
+        this.catchError(error, res);
       }
     });
   }
 
   parseSort(action: IndexAction, query: string): void {
-    if (!query) return null;
-    if (typeof query != 'string') throw 'Invalid sort!';
+    if (!query) return;
+    if (typeof query != 'string') return;
 
     let fields = query?.split(',');
     for (let field of fields) {
@@ -75,7 +114,7 @@ export class ServerRestApi implements ServerBase {
         } else if (action.entity.isSortable(sort.name)) {
           action.sort.push(sort);
         } else {
-          throw `property '${sort.name}' isn't sortable!`;
+          throw new Error('invalid-sort', `property '${sort.name}' isn't sortable!`);
         }
       }
     }
@@ -86,21 +125,21 @@ export class ServerRestApi implements ServerBase {
     if (typeof query != 'object') return;
 
     for (let key in query) {
-      let filter = { name: key, value: query[key] };
+      let filter: Filter = { name: key, value: query[key] };
       let hooks = action.entity.findHooks('filter', filter.name);
       if (hooks.length > 0) {
         action.filters.push({ name: filter.name, value: filter.value, hooks });
       } else if (action.entity.isFilterable(filter.name)) {
         action.filters.push(filter);
       } else {
-        throw `property '${key}' isn't filterable!`;
+        throw new Error('invalid-filter', `property '${key}' isn't filterable!`);
       }
     }
   }
 
   parseRelationship(action: IndexAction | ShowAction, query: string): void {
-    if (!query) return null;
-    if (typeof query != 'string') throw 'Invalid include!';
+    if (!query) return;
+    if (typeof query != 'string') return;
     let includes = query.split(',');
 
     let hooksRequested = [];
@@ -134,7 +173,7 @@ export class ServerRestApi implements ServerBase {
       } else if (key == 'offset') {
         action.page.offset = parseInt(query[key]);
       } else {
-        throw `property '${key}' is invalid for pagination!`;
+        throw new Error('invalid-pagination', `property '${key}' is invalid for pagination!`);
       }
     }
   }
@@ -159,6 +198,17 @@ export class ServerRestApi implements ServerBase {
       }
     }
     return result;
+  }
+
+  catchError(error: any, res: any): void {
+    if (error instanceof Error) {
+      if (error.type == 'record-not-found') {
+        res.status(404).send(error);
+      } else {
+        res.status(500).send(error);
+      }
+    }
+    res.status(500).send({ error: error.message || error });
   }
 }
 

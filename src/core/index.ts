@@ -1,6 +1,6 @@
 import { ServerBase, ServerRestApi } from '../server/index';
 import { EntityBase, EntityOptions } from '../orm/index';
-import { SequelizeEntity } from '../orm/sequelize';
+import { SequelizeEntity } from '../orm/sequelize/sequelize-entity';
 import { Hook } from './hooks';
 
 export class SharkApi {
