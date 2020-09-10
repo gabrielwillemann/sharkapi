@@ -1,6 +1,5 @@
-import { ServerBase, ServerRestApi } from '../server/index';
-import { EntityBase, EntityOptions } from '../orm/index';
-import { SequelizeEntity } from '../orm/sequelize/sequelize-entity';
+import { ServerBase } from '../server/index';
+import { EntityBase } from '../orm/index';
 import { Hook } from './hooks';
 
 export class SharkApi {
@@ -8,31 +7,9 @@ export class SharkApi {
   entities: Array<EntityBase>;
   options: CoreOptions;
 
-  constructor() {
+  constructor(options?: CoreOptions) {
     this.entities = [];
-    this.options = {};
-  }
-
-  restApiServer(express): ServerRestApi {
-    let restServer: ServerRestApi = new ServerRestApi();
-    restServer.core = this;
-    restServer.express = express;
-    this.server = restServer;
-    return restServer;
-  }
-
-  entitySequelize(entity, options?: EntityOptions): SequelizeEntity {
-    let ent = new SequelizeEntity();
-    ent.core = this;
-    ent.source = entity;
-    ent.options = options;
-    ent.loadSource();
-    this.entities.push(ent);
-    return ent;
-  }
-
-  createResources(): void {
-    this.server.createResources();
+    this.options = this.options || {};
   }
 
   getHooks(): Array<Hook> {

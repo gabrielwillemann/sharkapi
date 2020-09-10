@@ -6,10 +6,8 @@ export type Action = 'index' | 'show' | 'create' | 'update' | 'delete';
 export interface EntityBase {
   core: SharkApi;
   options?: EntityOptions;
-  name: string;
-  properties: Array<string>;
-
-  loadSource(): void;
+  name: EntityName;
+  fields: Array<Field>;
 
   isSortable(property: string): boolean;
   isFilterable(property: string): boolean;
@@ -23,6 +21,26 @@ export interface EntityBase {
   newUpdateAction(): UpdateAction;
   newDeleteAction(): DeleteAction;
 }
+
+export interface EntityOptions {
+  name?: EntityName;
+  hooks?: Array<Hook>;
+  actions?: Array<Action>;
+}
+
+export interface EntityName {
+  plural: string;
+  singular: string;
+}
+
+export interface Field {
+  name: string;
+  type: FieldType;
+  nullable: boolean;
+  primaryKey: boolean;
+}
+
+export type FieldType = 'string' | 'integer' | 'float' | 'boolean' | 'datetime';
 
 export interface IndexAction {
   entity: EntityBase;
@@ -59,11 +77,6 @@ export interface DeleteAction {
   entity: EntityBase;
   id: number | string;
   run(): Promise<any>;
-}
-
-export interface EntityOptions {
-  hooks?: Array<Hook>;
-  actions?: Array<Action>;
 }
 
 export interface Relationship {

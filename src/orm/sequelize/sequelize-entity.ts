@@ -1,44 +1,86 @@
 import { SharkApi } from '../../core/index';
 import { Error } from '../../core/error';
 import { Hook, HookTrigger, hookMatch } from '../../core/hooks';
-import { EntityBase, EntityOptions, Relationship } from '../index';
+import { EntityBase, EntityOptions, EntityName, Field, FieldType, Relationship } from '../index';
 import { SequelizeIndexAction } from './sequelize-index-action';
 import { SequelizeShowAction } from './sequelize-show-action';
 import { SequelizeCreateAction } from './sequelize-create-action';
 import { SequelizeUpdateAction } from './sequelize-update-action';
 import { SequelizeDeleteAction } from './sequelize-delete-action';
+import { plural, singular } from 'pluralize';
 
 export class SequelizeEntity implements EntityBase {
-  source;
+  source: any;
   core: SharkApi;
   options?: EntityOptions;
-  name: string;
-  properties: Array<string>;
+  name: EntityName;
+  fields: Array<Field>;
+
+  constructor(core: SharkApi, source: any, options?: EntityOptions) {
+    this.core = core;
+    core.entities.push(this);
+    this.source = source;
+    this.options = options;
+    this.loadSource();
+  }
 
   loadSource(): void {
     this.loadName();
-    this.loadProperties();
+    this.loadFields();
   }
 
   loadName(): void {
-    this.name = this.source.tableName;
-  }
-
-  loadProperties(): void {
-    this.properties = [];
-    for (let property in this.source.tableAttributes) {
-      this.properties.push(property);
+    if (this.options?.name) {
+      this.name = this.options?.name;
+    } else {
+      this.name = {
+        plural: plural(this.source.tableName),
+        singular: singular(this.source.tableName),
+      };
     }
   }
 
-  isSortable(property: string): boolean {
-    let field = this.properties.find((prop) => prop == property);
-    return !!field;
+  loadFields(): void {
+    this.fields = [];
+    let primaryKey = this.source.primaryKeyField;
+    for (let fieldName in this.source.tableAttributes) {
+      this.fields.push({
+        name: fieldName,
+        type: this.getFieldType(this.source.tableAttributes[fieldName].type.constructor.name),
+        nullable: true,
+        primaryKey: fieldName == primaryKey,
+      });
+    }
+    console.log(this.fields);
   }
 
-  isFilterable(property: string): boolean {
-    let field = this.properties.find((prop) => prop == property);
-    return !!field;
+  getFieldType(type: string): FieldType {
+    let result = {
+      BIGINT: 'integer',
+      INTEGER: 'integer',
+      SMALLINT: 'integer',
+      BOOLEAN: 'boolean',
+      CHAR: 'string',
+      STRING: 'string',
+      TEXT: 'string',
+      DATE: 'datetime',
+      DATEONLY: 'datetime',
+      TIME: 'datetime',
+      DECIMAL: 'float',
+      DOUBLE: 'float',
+      FLOAT: 'float',
+      NUMBER: 'float',
+      REAL: 'float',
+    };
+    return result[type];
+  }
+
+  isSortable(fieldName: string): boolean {
+    return !!this.fields.find((f) => f.name == fieldName);
+  }
+
+  isFilterable(fieldName: string): boolean {
+    return !!this.fields.find((f) => f.name == fieldName);
   }
 
   findRelationshipSources(relationships: Array<Relationship>, source?): void {
