@@ -51,7 +51,6 @@ export class SequelizeEntity implements EntityBase {
         primaryKey: fieldName == primaryKey,
       });
     }
-    console.log(this.fields);
   }
 
   getFieldType(type: string): FieldType {
@@ -64,8 +63,8 @@ export class SequelizeEntity implements EntityBase {
       STRING: 'string',
       TEXT: 'string',
       DATE: 'datetime',
-      DATEONLY: 'datetime',
-      TIME: 'datetime',
+      DATEONLY: 'date',
+      TIME: 'time',
       DECIMAL: 'float',
       DOUBLE: 'float',
       FLOAT: 'float',

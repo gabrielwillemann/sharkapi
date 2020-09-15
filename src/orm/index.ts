@@ -40,7 +40,7 @@ export interface Field {
   primaryKey: boolean;
 }
 
-export type FieldType = 'string' | 'integer' | 'float' | 'boolean' | 'datetime';
+export type FieldType = 'string' | 'integer' | 'float' | 'boolean' | 'datetime' | 'date' | 'time';
 
 export interface IndexAction {
   entity: EntityBase;

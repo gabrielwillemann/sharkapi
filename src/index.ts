@@ -3,8 +3,8 @@ export { ErrorType, Error } from './core/error';
 export { HookTrigger, Hook, HookRequest, hookMatch, findHooks, callHooks } from './core/hooks';
 
 export { ServerBase } from './server/index';
-export { ServerRestApi } from './server/rest-api';
-export { ServerGraphQl } from './server/graphql';
+export { ServerRestApi } from './server/restapi';
+export { ServerGraphQL } from './server/graphql';
 
 export {
   Action,

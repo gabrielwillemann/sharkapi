@@ -17,7 +17,8 @@ export type HookTrigger =
 export interface Hook {
   trigger: HookTrigger;
   match?: string | RegExp;
-  fn: (params?: any) => any;
+  fn?: (params?: any) => any;
+  prevent?: boolean;
 }
 
 export interface HookRequest {
@@ -45,7 +46,7 @@ export function findHooks(list: Array<Hook>, trigger: HookTrigger, name?: string
 
 export function callHooks(hooks: Array<Hook>, context: any, params?: any): any {
   for (let hook of hooks) {
-    if (hook.fn && typeof hook.fn == 'function') {
+    if (!hook.prevent && hook.fn && typeof hook.fn == 'function') {
       context = hook.fn({ context, ...params }) || context;
     }
   }
