@@ -12,7 +12,7 @@ export interface EntityBase {
   isSortable(property: string): boolean;
   isFilterable(property: string): boolean;
   findRelationshipSources(relationships: Array<Relationship>, source?);
-  findHooks(trigger: HookTrigger, match: string | RegExp): Array<Hook>;
+  findHooks(trigger: HookTrigger, name: string): Array<Hook>;
   getHooks(): Array<Hook>;
 
   newIndexAction(): IndexAction;
@@ -92,8 +92,10 @@ export interface Filter {
 
 export interface Sort {
   name: string;
-  criteria: 'asc' | 'desc';
+  criteria: SortCriteria;
 }
+
+export type SortCriteria = 'asc' | 'desc';
 
 export interface Page {
   limit?: number;

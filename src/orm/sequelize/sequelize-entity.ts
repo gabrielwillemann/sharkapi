@@ -44,10 +44,11 @@ export class SequelizeEntity implements EntityBase {
     this.fields = [];
     let primaryKey = this.source.primaryKeyField;
     for (let fieldName in this.source.tableAttributes) {
+      let field = this.source.tableAttributes[fieldName];
       this.fields.push({
         name: fieldName,
-        type: this.getFieldType(this.source.tableAttributes[fieldName].type.constructor.name),
-        nullable: true,
+        type: this.getFieldType(field.type.constructor.name),
+        nullable: typeof field.allowNull == 'boolean' ? field.allowNull : true,
         primaryKey: fieldName == primaryKey,
       });
     }
