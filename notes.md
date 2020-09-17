@@ -2,36 +2,17 @@
 
   - (OK) REST API
   - GraphQL
-    - types: queries and mudations
-    - Resolvers
-      - Actions
-      - Singular and plural names
-      - Use join?
-    - Sort
-      - Way 1:
-        - Get all fields
-        - Are there hooks for each sort/field? match string or regex
-        - If there are hooks with PREVENT=TRUE, don't create it
-      - Way 2:
-        - Get all hooks with type SORT and match type equal string
-        - If there are hooks with PREVENT=TRUE, don't create it
-    - Filters
-      - Way 1:
-        - Get all fields
-        - Are there hooks for each filter/field? match string or regex
-        - If there are hooks with PREVENT=TRUE, don't create it
-      - Way 2:
-        - Get all hooks with type FILTER and match type equal string
-        - If there are hooks with PREVENT=TRUE, don't create it
+    - (DOING) Types (queries and mudations) + Resolvers
+    - OK Sort
+    - OK Filters
     - Relationship
       - Get all relationships
       - Are there hooks for each relationship? match string or regex
       - If there are hooks with PREVENT=TRUE, don't create this relationship
       - Search type for this relationship, if it doesn't exist, create it (attention with mongodb)
+      - RelationshipsInput: Booelan
     - Pagination and Connection Pattern
     - GraphQL with socket?
-    - https://www.apollographql.com/blog/designing-graphql-mutations-e09de826ed97/
-    - https://graphql.org/graphql-js/mutations-and-input-types/
   - (DOING) SequelizeJs
   - TypeOrm
   - Mongoose

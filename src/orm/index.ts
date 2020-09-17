@@ -9,6 +9,8 @@ export interface EntityBase {
   name: EntityName;
   fields: Array<Field>;
 
+  getRelationships(): Array<Relationship>;
+
   isSortable(property: string): boolean;
   isFilterable(property: string): boolean;
   findRelationshipSources(relationships: Array<Relationship>, source?);
@@ -83,7 +85,10 @@ export interface Relationship {
   name: string;
   source?: any;
   children?: Array<Relationship>;
+  type?: RelationshipType;
 }
+
+export type RelationshipType = 'has-one' | 'belongs-to' | 'has-many';
 
 export interface Filter {
   name: string;

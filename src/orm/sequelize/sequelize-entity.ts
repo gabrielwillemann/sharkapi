@@ -1,7 +1,7 @@
 import { SharkApi } from '../../core/index';
 import { Error } from '../../core/error';
 import { Hook, HookTrigger, hookMatch } from '../../core/hooks';
-import { EntityBase, EntityOptions, EntityName, Field, FieldType, Relationship } from '../index';
+import { EntityBase, EntityOptions, EntityName, Field, FieldType, Relationship, RelationshipType } from '../index';
 import { SequelizeIndexAction } from './sequelize-index-action';
 import { SequelizeShowAction } from './sequelize-show-action';
 import { SequelizeCreateAction } from './sequelize-create-action';
@@ -41,17 +41,23 @@ export class SequelizeEntity implements EntityBase {
   }
 
   loadFields(): void {
-    this.fields = [];
-    let primaryKey = this.source.primaryKeyField;
-    for (let fieldName in this.source.tableAttributes) {
-      let field = this.source.tableAttributes[fieldName];
-      this.fields.push({
+    this.fields = this.getFields();
+  }
+
+  getFields(source?: any): Array<Field> {
+    source = source || this.source;
+    let result: Array<Field> = [];
+    let primaryKey = source.primaryKeyField;
+    for (let fieldName in source.tableAttributes) {
+      let field = source.tableAttributes[fieldName];
+      result.push({
         name: fieldName,
         type: this.getFieldType(field.type.constructor.name),
         nullable: typeof field.allowNull == 'boolean' ? field.allowNull : true,
         primaryKey: fieldName == primaryKey,
       });
     }
+    return result;
   }
 
   getFieldType(type: string): FieldType {
@@ -90,6 +96,7 @@ export class SequelizeEntity implements EntityBase {
       for (let name in source.associations) {
         if (name.toLowerCase() == relationship.name.toLowerCase()) {
           relationship.source = source.associations[name].target;
+          relationship.type = this.getRelationshipType(source.associations[name].associationType);
           break;
         }
       }
@@ -98,6 +105,27 @@ export class SequelizeEntity implements EntityBase {
       }
       this.findRelationshipSources(relationship.children, relationship.source);
     }
+  }
+
+  getRelationships(): Array<Relationship> {
+    let relationships: Array<Relationship> = [];
+    for (let name in this.source.associations) {
+      let association = this.source.associations[name];
+      relationships.push({
+        name: name,
+        source: association.target,
+        type: this.getRelationshipType(association.associationType),
+      });
+    }
+
+    return relationships;
+  }
+
+  getRelationshipType(relationship: string): RelationshipType {
+    if (relationship == 'HasOne') return 'has-one';
+    if (relationship == 'HasMany') return 'has-many';
+    if (relationship == 'BelongsTo') return 'belongs-to';
+    return null;
   }
 
   getHooks(): Array<Hook> {
