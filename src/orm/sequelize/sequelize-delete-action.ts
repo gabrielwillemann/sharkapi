@@ -1,11 +1,16 @@
 import { findHooks, callHooks } from '../../core/hooks';
 import { Error } from '../../core/error';
-import { DeleteAction } from '../index';
+import { Action, DeleteAction } from '../index';
 import { SequelizeEntity } from './sequelize-entity.js';
 
 export class SequelizeDeleteAction implements DeleteAction {
+  type: Action;
   entity: SequelizeEntity;
   id: number | string;
+
+  constructor() {
+    this.type = 'delete';
+  }
 
   async run(): Promise<any> {
     let query;

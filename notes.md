@@ -5,14 +5,9 @@
     - (DOING) Types (queries and mudations) + Resolvers
     - OK Sort
     - OK Filters
-    - Relationship
-      - Get all relationships
-      - Are there hooks for each relationship? match string or regex
-      - If there are hooks with PREVENT=TRUE, don't create this relationship
-      - Search type for this relationship, if it doesn't exist, create it (attention with mongodb)
-      - RelationshipsInput: Booelan
-    - Pagination and Connection Pattern
-    - GraphQL with socket?
+    - OK Relationship
+    - OK Pagination and Connection Pattern
+    - Select Fields
   - (DOING) SequelizeJs
   - TypeOrm
   - Mongoose

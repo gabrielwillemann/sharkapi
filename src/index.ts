@@ -4,7 +4,7 @@ export { HookTrigger, Hook, HookRequest, hookMatch, findHooks, callHooks } from 
 
 export { ServerBase } from './server/index';
 export { ServerRestApi } from './server/restapi';
-export { ServerGraphQL } from './server/graphql';
+export { ServerGraphQL } from './server/graphql/server-graphql';
 
 export {
   Action,

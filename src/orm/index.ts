@@ -37,38 +37,44 @@ export interface EntityName {
 
 export interface Field {
   name: string;
-  type: FieldType;
-  nullable: boolean;
-  primaryKey: boolean;
+  type?: FieldType;
+  nullable?: boolean;
+  primaryKey?: boolean;
 }
 
 export type FieldType = 'string' | 'integer' | 'float' | 'boolean' | 'datetime' | 'date' | 'time';
 
 export interface IndexAction {
+  type: Action;
   entity: EntityBase;
   sort: Array<Sort | HookRequest>;
   filters: Array<Filter | HookRequest>;
   relationships: Array<Relationship | HookRequest>;
   page: Page;
   pageHooks: Array<HookRequest>;
+  selectedFields: Array<Field>;
 
   run(): Promise<any>;
 }
 
 export interface ShowAction {
+  type: Action;
   entity: EntityBase;
   relationships: Array<Relationship | HookRequest>;
+  selectedFields: Array<Field>;
   id: number | string;
   run(): Promise<any>;
 }
 
 export interface CreateAction {
+  type: Action;
   entity: EntityBase;
   data: any;
   run(): Promise<any>;
 }
 
 export interface UpdateAction {
+  type: Action;
   entity: EntityBase;
   data: any;
   id: number | string;
@@ -76,6 +82,7 @@ export interface UpdateAction {
 }
 
 export interface DeleteAction {
+  type: Action;
   entity: EntityBase;
   id: number | string;
   run(): Promise<any>;
@@ -86,6 +93,7 @@ export interface Relationship {
   source?: any;
   children?: Array<Relationship>;
   type?: RelationshipType;
+  fields?: Array<Field>;
 }
 
 export type RelationshipType = 'has-one' | 'belongs-to' | 'has-many';

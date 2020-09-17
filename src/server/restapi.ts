@@ -164,8 +164,6 @@ export class ServerRestApi implements ServerBase {
     if (query instanceof Array) return;
     if (typeof query != 'object') return;
 
-    action.page = action.page || {};
-    action.pageHooks = action.pageHooks || [];
     for (let key in query) {
       let hooks = action.entity.findHooks('page', key);
       if (hooks.length > 0) {

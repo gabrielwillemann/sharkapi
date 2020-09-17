@@ -1,21 +1,26 @@
 import { HookRequest, findHooks, callHooks } from '../../core/hooks';
 import { Error } from '../../core/error';
-import { ShowAction, Relationship } from '../index';
+import { ShowAction, Relationship, Action, Field } from '../index';
 import { SequelizeEntity } from './sequelize-entity.js';
-import { factoryInclude } from './helpers.js';
+import { factoryInclude, factoryAttributes } from './helpers.js';
 
 export class SequelizeShowAction implements ShowAction {
+  type: Action;
   entity: SequelizeEntity;
   relationships: Array<Relationship | HookRequest>;
   id: number | string;
+  selectedFields: Array<Field>;
 
   constructor() {
+    this.type = 'show';
     this.relationships = [];
+    this.selectedFields = [];
   }
 
   async run(): Promise<any> {
     let query;
     let context = { subQuery: false };
+    context = factoryAttributes(this.selectedFields, context) || context;
     context = factoryInclude(this.relationships, context) || context;
 
     context = callHooks(findHooks(this.entity.getHooks(), 'show-before'), context);

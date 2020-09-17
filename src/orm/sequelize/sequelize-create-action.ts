@@ -1,10 +1,15 @@
 import { findHooks, callHooks } from '../../core/hooks';
-import { CreateAction } from '../index';
+import { Action, CreateAction } from '../index';
 import { SequelizeEntity } from './sequelize-entity.js';
 
 export class SequelizeCreateAction implements CreateAction {
+  type: Action;
   entity: SequelizeEntity;
   data: any;
+
+  constructor() {
+    this.type = 'create';
+  }
 
   async run(): Promise<any> {
     let query;

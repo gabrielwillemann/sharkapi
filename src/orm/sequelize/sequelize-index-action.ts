@@ -1,25 +1,32 @@
 import { HookRequest, findHooks, callHooks } from '../../core/hooks';
-import { IndexAction, Relationship, Filter, Sort, Page } from '../index';
+import { IndexAction, Relationship, Filter, Sort, Page, Action, Field } from '../index';
 import { SequelizeEntity } from './sequelize-entity.js';
-import { factoryInclude, factoryOrder, factoryWhere, factoryPage } from './helpers.js';
+import { factoryInclude, factoryOrder, factoryWhere, factoryPage, factoryAttributes } from './helpers.js';
 
 export class SequelizeIndexAction implements IndexAction {
+  type: Action;
   entity: SequelizeEntity;
   sort: Array<Sort | HookRequest>;
   filters: Array<Filter | HookRequest>;
   relationships: Array<Relationship | HookRequest>;
   page: Page;
   pageHooks: Array<HookRequest>;
+  selectedFields: Array<Field>;
 
   constructor() {
+    this.type = 'index';
     this.sort = [];
     this.filters = [];
     this.relationships = [];
+    this.page = {};
+    this.pageHooks = [];
+    this.selectedFields = [];
   }
 
   async run(): Promise<any> {
     let query;
     let context = { subQuery: false };
+    context = factoryAttributes(this.selectedFields, context) || context;
     context = factoryInclude(this.relationships, context) || context;
     context = factoryWhere(this.filters, context) || context;
     context = factoryOrder(this.sort, context) || context;

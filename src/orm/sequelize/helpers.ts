@@ -1,5 +1,5 @@
 import { HookRequest, callHooks } from '../../core/hooks';
-import { Relationship, Sort, Filter, Page } from '../index';
+import { Relationship, Sort, Filter, Page, Field } from '../index';
 
 export function factoryInclude(relationships, context: any): any {
   context.include = context.include || [];
@@ -17,10 +17,16 @@ export function factoryInclude(relationships, context: any): any {
 
 export function factoryRelationship(relationships: Array<Relationship>): Array<any> {
   relationships = relationships || [];
-  return relationships.map((relationship) => ({
-    model: relationship.source,
-    include: factoryRelationship(relationship.children),
-  }));
+  return relationships.map((relationship) => {
+    let result = {
+      model: relationship.source,
+      include: factoryRelationship(relationship.children),
+    };
+    if (relationship.fields && relationship.fields.length > 0) {
+      result['attributes'] = relationship.fields.map((f) => f.name);
+    }
+    return result;
+  });
 }
 
 export function factoryOrder(sort: Array<Sort | HookRequest>, context: any): any {
@@ -63,6 +69,16 @@ export function factoryPage(page: Page, pageHooks: Array<HookRequest>, context: 
   pageHooks = pageHooks || [];
   for (let h of pageHooks) {
     context = callHooks(h.hooks, context, { name: h.name, value: h.value });
+  }
+  return context;
+}
+
+export function factoryAttributes(selectedFields: Array<Field>, context: any): any {
+  if (selectedFields && selectedFields.length > 0) {
+    context.attributes = context.attributes || [];
+    for (let field of selectedFields) {
+      context.attributes.push(field.name);
+    }
   }
   return context;
 }
