@@ -2,10 +2,16 @@ import { pascalCase } from 'change-case';
 import { singular } from 'pluralize';
 
 import { SharkApi } from '../../core/index';
-import { EntityBase, Field, Relationship } from '../../orm';
+import { Action, EntityBase, Field, Relationship } from '../../orm';
 import { ServerBase } from '../index';
 
-import { GraphQLIndexAction, GraphQLShowAction } from './actions';
+import {
+  GraphQLIndexAction,
+  GraphQLShowAction,
+  GraphQLCreateAction,
+  GraphQLUpdateAction,
+  GraphQLDeleteAction,
+} from './actions';
 
 export class ServerGraphQL implements ServerBase {
   graphql: any;
@@ -22,28 +28,52 @@ export class ServerGraphQL implements ServerBase {
   }
 
   createResources(): any {
+    let queryFields = {};
+    let mutationFields = {};
+
+    let typePageInfo = this.factoryTypePageInfo();
+    for (let entity of this.core.entities) {
+      let actions = entity.options?.actions || ['index', 'show', 'create', 'update', 'delete'];
+      let type = this.factoryType(entity);
+      let typeInput = this.factoryTypeInput(entity);
+      this.actionQueries(queryFields, entity, actions, { type, typePageInfo });
+      this.actionMutations(mutationFields, entity, actions, { type, typeInput });
+    }
+
     let queryType = new this.graphql.GraphQLObjectType({
       name: 'Query',
-      fields: () => {
-        let result = {};
-        let typePageInfo = this.factoryTypePageInfo();
-        for (let entity of this.core.entities) {
-          let actions = entity.options?.actions || ['index', 'show', 'create', 'update', 'delete'];
-          let type = this.factoryType(entity);
-          let typeInput = this.factoryTypeInput(entity);
-
-          if (actions.includes('index')) {
-            Object.assign(result, this.actionIndex(entity, { type, typePageInfo }));
-          }
-          if (actions.includes('show')) {
-            Object.assign(result, this.actionShow(entity, { type }));
-          }
-        }
-        return result;
-      },
+      fields: () => queryFields,
     });
 
-    return new this.graphql.GraphQLSchema({ query: queryType });
+    let mutationType = new this.graphql.GraphQLObjectType({
+      name: 'Mutation',
+      fields: () => mutationFields,
+    });
+
+    this.types.push(queryType);
+    this.types.push(mutationType);
+    return new this.graphql.GraphQLSchema({ query: queryType, mutation: mutationType });
+  }
+
+  actionQueries(queryFields: any, entity: EntityBase, actions: Array<Action>, { type, typePageInfo }): void {
+    if (actions.includes('index')) {
+      Object.assign(queryFields, this.actionIndex(entity, { type, typePageInfo }));
+    }
+    if (actions.includes('show')) {
+      Object.assign(queryFields, this.actionShow(entity, { type }));
+    }
+  }
+
+  actionMutations(mutationFields: any, entity: EntityBase, actions: Array<Action>, { type, typeInput }): void {
+    if (actions.includes('create')) {
+      Object.assign(mutationFields, this.actionCreate(entity, { type, typeInput }));
+    }
+    if (actions.includes('update')) {
+      Object.assign(mutationFields, this.actionUpdate(entity, { type, typeInput }));
+    }
+    if (actions.includes('delete')) {
+      Object.assign(mutationFields, this.actionDelete(entity, { type }));
+    }
   }
 
   actionIndex(entity: EntityBase, { type, typePageInfo }): any {
@@ -60,7 +90,7 @@ export class ServerGraphQL implements ServerBase {
       [entity.name.plural]: {
         type: typeConnection,
         args: args,
-        resolve: GraphQLIndexAction.bind(null, entity),
+        resolve: GraphQLIndexAction.bind(this, entity),
       },
     };
   }
@@ -70,7 +100,44 @@ export class ServerGraphQL implements ServerBase {
       [entity.name.singular]: {
         type: type,
         args: this.factoryFields(entity, true),
-        resolve: GraphQLShowAction.bind(null, entity),
+        resolve: GraphQLShowAction.bind(this, entity),
+      },
+    };
+  }
+
+  actionCreate(entity: EntityBase, { type, typeInput }): any {
+    return {
+      [`create${pascalCase(entity.name.singular)}`]: {
+        type: type,
+        args: {
+          input: { type: new this.graphql.GraphQLNonNull(typeInput) },
+        },
+        resolve: GraphQLCreateAction.bind(this, entity),
+      },
+    };
+  }
+
+  actionUpdate(entity: EntityBase, { type, typeInput }): any {
+    return {
+      [`update${pascalCase(entity.name.singular)}`]: {
+        type: type,
+        args: {
+          id: { type: new this.graphql.GraphQLNonNull(this.graphql.GraphQLID) },
+          input: { type: new this.graphql.GraphQLNonNull(typeInput) },
+        },
+        resolve: GraphQLUpdateAction.bind(this, entity),
+      },
+    };
+  }
+
+  actionDelete(entity: EntityBase, { type }): any {
+    return {
+      [`delete${pascalCase(entity.name.singular)}`]: {
+        type: type,
+        args: {
+          id: { type: new this.graphql.GraphQLNonNull(this.graphql.GraphQLID) },
+        },
+        resolve: GraphQLDeleteAction.bind(this, entity),
       },
     };
   }
@@ -89,7 +156,7 @@ export class ServerGraphQL implements ServerBase {
   }
 
   factoryTypeInput(entity: EntityBase): any {
-    let type = new this.graphql.GraphQLObjectType({
+    let type = new this.graphql.GraphQLInputObjectType({
       name: `${pascalCase(entity.name.singular)}Input`,
       fields: this.factoryFields(entity, false),
     });
@@ -200,9 +267,9 @@ export class ServerGraphQL implements ServerBase {
       let insert: boolean = primaryKey == undefined || field.primaryKey == primaryKey;
       if (insert) {
         let type = this.getGraphQLType(field);
-        if (!field.nullable) {
-          type = new this.graphql.GraphQLNonNull(type);
-        }
+        // if (!field.nullable) {
+        //   type = new this.graphql.GraphQLNonNull(type);
+        // }
         result[field.name] = { type };
       }
     }
