@@ -1,6 +1,6 @@
-import { SharkApi } from '../../core/index';
+import { SharkAPI } from '../../core/index';
 import { Error } from '../../core/error';
-import { Hook, HookTrigger, hookMatch } from '../../core/hooks';
+import { Hook, HookTrigger, findHooks } from '../../core/hooks';
 import { EntityBase, EntityOptions, EntityName, Field, FieldType, Relationship, RelationshipType } from '../index';
 import { SequelizeIndexAction } from './sequelize-index-action';
 import { SequelizeShowAction } from './sequelize-show-action';
@@ -11,12 +11,12 @@ import { plural, singular } from 'pluralize';
 
 export class SequelizeEntity implements EntityBase {
   source: any;
-  core: SharkApi;
+  core: SharkAPI;
   options?: EntityOptions;
   name: EntityName;
   fields: Array<Field>;
 
-  constructor(core: SharkApi, source: any, options?: EntityOptions) {
+  constructor(core: SharkAPI, source: any, options?: EntityOptions) {
     this.core = core;
     core.entities.push(this);
     this.source = source;
@@ -134,7 +134,7 @@ export class SequelizeEntity implements EntityBase {
   }
 
   findHooks(trigger: HookTrigger, name: string): Array<Hook> {
-    return this.getHooks().filter((hook) => hookMatch(hook, trigger, name));
+    return findHooks(this.getHooks(), trigger, name);
   }
 
   newIndexAction(): SequelizeIndexAction {

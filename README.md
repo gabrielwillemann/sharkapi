@@ -38,6 +38,7 @@
   - (OK) GraphQL
   - (OK) SequelizeJs
   - Tests
+    - https://github.com/goldbergyoni/javascript-testing-best-practices/
   - Documentation
   - TypeOrm
   - Mongoose

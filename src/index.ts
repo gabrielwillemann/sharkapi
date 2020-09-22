@@ -1,29 +1,14 @@
-export { SharkApi, CoreOptions } from './core/index';
-export { ErrorType, Error } from './core/error';
-export { HookTrigger, Hook, HookRequest, hookMatch, findHooks, callHooks } from './core/hooks';
+export { SharkAPI, CoreOptions } from './core/index';
+export { ServerRestAPI, RestAPIOptions } from './server/restapi/index';
+export { ServerGraphQL, GraphQLOptions } from './server/graphql/index';
+export { SequelizeEntity } from './orm/sequelize/index';
 
-export { ServerBase } from './server/index';
-export { ServerRestApi } from './server/restapi';
-export { ServerGraphQL } from './server/graphql/server-graphql';
+export * as server from './server/index';
+export * as restAPI from './server/restapi/index';
+export * as graphQL from './server/graphql/index';
 
-export {
-  Action,
-  EntityBase,
-  IndexAction,
-  ShowAction,
-  CreateAction,
-  UpdateAction,
-  DeleteAction,
-  EntityOptions,
-  Relationship,
-  Filter,
-  Sort,
-  Page,
-} from './orm/index';
-export { factoryInclude, factoryRelationship, factoryOrder, factoryWhere, factoryPage } from './orm/sequelize/helpers';
-export { SequelizeEntity } from './orm/sequelize/sequelize-entity';
-export { SequelizeIndexAction } from './orm/sequelize/sequelize-index-action';
-export { SequelizeShowAction } from './orm/sequelize/sequelize-show-action';
-export { SequelizeCreateAction } from './orm/sequelize/sequelize-create-action';
-export { SequelizeUpdateAction } from './orm/sequelize/sequelize-update-action';
-export { SequelizeDeleteAction } from './orm/sequelize/sequelize-delete-action';
+export * as orm from './orm/index';
+export * as sequelize from './orm/sequelize/index';
+
+export * as error from './core/error';
+export * as hooks from './core/hooks';

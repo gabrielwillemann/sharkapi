@@ -2,7 +2,7 @@ import { ServerBase } from '../server/index';
 import { EntityBase } from '../orm/index';
 import { Hook } from './hooks';
 
-export class SharkApi {
+export class SharkAPI {
   server: ServerBase;
   entities: Array<EntityBase>;
   options: CoreOptions;

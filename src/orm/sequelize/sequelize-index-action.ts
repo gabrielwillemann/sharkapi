@@ -33,10 +33,10 @@ export class SequelizeIndexAction implements IndexAction {
     context = factoryPage(this.page, this.pageHooks, context) || context;
 
     context = callHooks(findHooks(this.entity.getHooks(), 'index-before'), context);
-    let count = await this.entity.source.count(context);
+    let totalCount = await this.entity.source.count(context);
     query = await this.entity.source.findAll(context);
     query = callHooks(findHooks(this.entity.getHooks(), 'index-after'), query);
 
-    return { count, data: query };
+    return { totalCount, data: query };
   }
 }

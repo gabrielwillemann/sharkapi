@@ -1,25 +1,25 @@
 import { pascalCase } from 'change-case';
 import { singular } from 'pluralize';
 
-import { SharkApi } from '../../core/index';
+import { SharkAPI } from '../../core/index';
 import { Action, EntityBase, Field, Relationship } from '../../orm';
 import { ServerBase } from '../index';
 
 import {
-  GraphQLIndexAction,
-  GraphQLShowAction,
-  GraphQLCreateAction,
-  GraphQLUpdateAction,
-  GraphQLDeleteAction,
+  graphQLIndexAction,
+  graphQLShowAction,
+  graphQLCreateAction,
+  graphQLUpdateAction,
+  graphQLDeleteAction,
 } from './actions';
 
 export class ServerGraphQL implements ServerBase {
   graphql: any;
   graphqlIsoDate: any;
-  core: SharkApi;
+  core: SharkAPI;
   types: Array<any>;
 
-  constructor(core: SharkApi, { graphql, graphqlIsoDate }: GraphQLOptions) {
+  constructor(core: SharkAPI, { graphql, graphqlIsoDate }: GraphQLOptions) {
     this.core = core;
     core.server = this;
     this.graphql = graphql;
@@ -90,7 +90,7 @@ export class ServerGraphQL implements ServerBase {
       [entity.name.plural]: {
         type: typeConnection,
         args: args,
-        resolve: GraphQLIndexAction.bind(this, entity),
+        resolve: graphQLIndexAction.bind(this, entity),
       },
     };
   }
@@ -100,7 +100,7 @@ export class ServerGraphQL implements ServerBase {
       [entity.name.singular]: {
         type: type,
         args: this.factoryFields(entity, true),
-        resolve: GraphQLShowAction.bind(this, entity),
+        resolve: graphQLShowAction.bind(this, entity),
       },
     };
   }
@@ -112,7 +112,7 @@ export class ServerGraphQL implements ServerBase {
         args: {
           input: { type: new this.graphql.GraphQLNonNull(typeInput) },
         },
-        resolve: GraphQLCreateAction.bind(this, entity),
+        resolve: graphQLCreateAction.bind(this, entity),
       },
     };
   }
@@ -125,7 +125,7 @@ export class ServerGraphQL implements ServerBase {
           id: { type: new this.graphql.GraphQLNonNull(this.graphql.GraphQLID) },
           input: { type: new this.graphql.GraphQLNonNull(typeInput) },
         },
-        resolve: GraphQLUpdateAction.bind(this, entity),
+        resolve: graphQLUpdateAction.bind(this, entity),
       },
     };
   }
@@ -137,7 +137,7 @@ export class ServerGraphQL implements ServerBase {
         args: {
           id: { type: new this.graphql.GraphQLNonNull(this.graphql.GraphQLID) },
         },
-        resolve: GraphQLDeleteAction.bind(this, entity),
+        resolve: graphQLDeleteAction.bind(this, entity),
       },
     };
   }
@@ -267,9 +267,6 @@ export class ServerGraphQL implements ServerBase {
       let insert: boolean = primaryKey == undefined || field.primaryKey == primaryKey;
       if (insert) {
         let type = this.getGraphQLType(field);
-        // if (!field.nullable) {
-        //   type = new this.graphql.GraphQLNonNull(type);
-        // }
         result[field.name] = { type };
       }
     }

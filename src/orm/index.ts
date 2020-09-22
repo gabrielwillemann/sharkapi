@@ -1,19 +1,19 @@
-import { SharkApi } from '../core/index';
+import { SharkAPI } from '../core/index';
 import { Hook, HookTrigger, HookRequest } from '../core/hooks';
 
 export type Action = 'index' | 'show' | 'create' | 'update' | 'delete';
 
 export interface EntityBase {
-  core: SharkApi;
+  core: SharkAPI;
   options?: EntityOptions;
   name: EntityName;
   fields: Array<Field>;
 
-  getRelationships(): Array<Relationship>;
-
   isSortable(property: string): boolean;
   isFilterable(property: string): boolean;
   findRelationshipSources(relationships: Array<Relationship>, source?);
+  getRelationships(): Array<Relationship>;
+
   findHooks(trigger: HookTrigger, name: string): Array<Hook>;
   getHooks(): Array<Hook>;
 

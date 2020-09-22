@@ -1,5 +1,5 @@
 {
-  "name": "sharkapi",
+  "name": "SharkAPI",
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
@@ -8,21 +8,24 @@
     "start": "npm run dev",
     "dev": "nodemon --ext js,ts --watch src --exec npm run build",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gabrielwillemann/sharkapi.git"
+    "url": "git+https://github.com/gabrielwillemann/SharkAPI.git"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gabrielwillemann/sharkapi/issues"
+    "url": "https://github.com/gabrielwillemann/SharkAPI/issues"
   },
-  "homepage": "https://github.com/gabrielwillemann/sharkapi#readme",
+  "homepage": "https://github.com/gabrielwillemann/SharkAPI#readme",
   "devDependencies": {
+    "@types/jest": "^26.0.14",
+    "jest": "^26.4.2",
     "nodemon": "^2.0.4",
+    "ts-jest": "^26.4.0",
     "ts-node": "^8.10.2",
     "typescript": "^4.0.2"
   },

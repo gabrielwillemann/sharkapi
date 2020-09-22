@@ -1,6 +1,6 @@
-import { SharkApi } from '../core/index';
+import { SharkAPI } from '../core/index';
 
 export interface ServerBase {
-  core: SharkApi;
+  core: SharkAPI;
   createResources(): any;
 }

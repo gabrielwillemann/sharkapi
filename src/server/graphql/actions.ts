@@ -1,8 +1,7 @@
 import { EntityBase } from '../../orm';
-
 import { parseSort, parseFilter, parseRelationships, parsePage, parseRootFields } from './helpers';
 
-export async function GraphQLIndexAction(entity: EntityBase, source, args, context, info): Promise<any> {
+export async function graphQLIndexAction(entity: EntityBase, source, args, context, info): Promise<any> {
   try {
     let action = entity.newIndexAction();
     parseSort(action, args.sort);
@@ -17,7 +16,7 @@ export async function GraphQLIndexAction(entity: EntityBase, source, args, conte
   }
 }
 
-export async function GraphQLShowAction(entity: EntityBase, source, args, context, info): Promise<any> {
+export async function graphQLShowAction(entity: EntityBase, source, args, context, info): Promise<any> {
   try {
     let action = entity.newShowAction();
     action.id = args.id;
@@ -30,32 +29,32 @@ export async function GraphQLShowAction(entity: EntityBase, source, args, contex
   }
 }
 
-export async function GraphQLCreateAction(entity: EntityBase, source, args, context, info): Promise<any> {
+export async function graphQLCreateAction(entity: EntityBase, source, args, context, info): Promise<any> {
   try {
     let action = entity.newCreateAction();
     action.data = args.input;
     let row = await action.run();
-    return await GraphQLShowAction.call(this, entity, source, { id: args.id }, context, info);
+    return await graphQLShowAction.call(this, entity, source, { id: args.id }, context, info);
   } catch (error) {
     throw new this.graphql.GraphQLError(error.message || error);
   }
 }
 
-export async function GraphQLUpdateAction(entity: EntityBase, source, args, context, info): Promise<any> {
+export async function graphQLUpdateAction(entity: EntityBase, source, args, context, info): Promise<any> {
   try {
     let action = entity.newUpdateAction();
     action.id = args.id;
     action.data = args.input;
     let row = await action.run();
-    return await GraphQLShowAction.call(this, entity, source, { id: args.id }, context, info);
+    return await graphQLShowAction.call(this, entity, source, { id: args.id }, context, info);
   } catch (error) {
     throw new this.graphql.GraphQLError(error.message || error);
   }
 }
 
-export async function GraphQLDeleteAction(entity: EntityBase, source, args, context, info): Promise<any> {
+export async function graphQLDeleteAction(entity: EntityBase, source, args, context, info): Promise<any> {
   try {
-    let row = await GraphQLShowAction.call(this, entity, source, { id: args.id }, context, info);
+    let row = await graphQLShowAction.call(this, entity, source, { id: args.id }, context, info);
     let action = entity.newDeleteAction();
     action.id = args.id;
     await action.run();

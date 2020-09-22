@@ -106,10 +106,6 @@ function createRelationships(fieldNodes: any): Array<Relationship> {
   let relationships: Array<Relationship> = [];
   for (let key in fieldNodes) {
     if (fieldNodes[key]) {
-      // let fields = Object.keys(fieldNodes[key])
-      //   .filter((field) => !fieldNodes[key][field])
-      //   .map((field) => ({ name: field }));
-
       relationships.push({
         name: key,
         fields: parseFieldByFieldNode(fieldNodes[key]),
