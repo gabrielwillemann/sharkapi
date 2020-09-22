@@ -26,7 +26,7 @@ export class ServerRestAPI implements ServerBase {
   }
 
   actionShow(entity: EntityBase): void {
-    this.express.get(`/${entity.name.plural}/:id`, async (req, res) => {
+    this.express.get(`/${entity.name.plural.toLowerCase()}/:id`, async (req, res) => {
       try {
         let action = entity.newShowAction();
         parseRelationship(action, req.query.include);
@@ -40,7 +40,7 @@ export class ServerRestAPI implements ServerBase {
   }
 
   actionCreate(entity: EntityBase): void {
-    this.express.post(`/${entity.name.plural}`, async (req, res) => {
+    this.express.post(`/${entity.name.plural.toLowerCase()}`, async (req, res) => {
       try {
         let action = entity.newCreateAction();
         action.data = req.body;
@@ -64,12 +64,12 @@ export class ServerRestAPI implements ServerBase {
         this.catchError(error, res);
       }
     };
-    this.express.patch(`/${entity.name.plural}/:id`, fn);
-    this.express.put(`/${entity.name.plural}/:id`, fn);
+    this.express.patch(`/${entity.name.plural.toLowerCase()}/:id`, fn);
+    this.express.put(`/${entity.name.plural.toLowerCase()}/:id`, fn);
   }
 
   actionDelete(entity: EntityBase): void {
-    this.express.delete(`/${entity.name.plural}/:id`, async (req, res) => {
+    this.express.delete(`/${entity.name.plural.toLowerCase()}/:id`, async (req, res) => {
       try {
         let action = entity.newDeleteAction();
         action.id = req.params.id;
@@ -82,7 +82,7 @@ export class ServerRestAPI implements ServerBase {
   }
 
   actionIndex(entity: EntityBase): void {
-    this.express.get(`/${entity.name.plural}`, async (req, res) => {
+    this.express.get(`/${entity.name.plural.toLowerCase()}`, async (req, res) => {
       try {
         let action = entity.newIndexAction();
         parseRelationship(action, req.query.include);

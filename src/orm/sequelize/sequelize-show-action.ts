@@ -1,8 +1,8 @@
 import { HookRequest, findHooks, callHooks } from '../../core/hooks';
 import { Error } from '../../core/error';
 import { ShowAction, Relationship, Action, Field } from '../index';
-import { SequelizeEntity } from './sequelize-entity.js';
-import { factoryInclude, factoryAttributes } from './helpers.js';
+import { SequelizeEntity } from './sequelize-entity';
+import { factoryInclude, factoryAttributes } from './helpers';
 
 export class SequelizeShowAction implements ShowAction {
   type: Action;

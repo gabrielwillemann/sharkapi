@@ -1,7 +1,7 @@
 import { findHooks, callHooks } from '../../core/hooks';
 import { Error } from '../../core/error';
 import { Action, DeleteAction } from '../index';
-import { SequelizeEntity } from './sequelize-entity.js';
+import { SequelizeEntity } from './sequelize-entity';
 
 export class SequelizeDeleteAction implements DeleteAction {
   type: Action;

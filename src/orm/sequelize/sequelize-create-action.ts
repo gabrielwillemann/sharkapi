@@ -1,6 +1,6 @@
 import { findHooks, callHooks } from '../../core/hooks';
 import { Action, CreateAction } from '../index';
-import { SequelizeEntity } from './sequelize-entity.js';
+import { SequelizeEntity } from './sequelize-entity';
 
 export class SequelizeCreateAction implements CreateAction {
   type: Action;

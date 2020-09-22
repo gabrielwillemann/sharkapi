@@ -1,7 +1,7 @@
 import { HookRequest, findHooks, callHooks } from '../../core/hooks';
 import { IndexAction, Relationship, Filter, Sort, Page, Action, Field } from '../index';
-import { SequelizeEntity } from './sequelize-entity.js';
-import { factoryInclude, factoryOrder, factoryWhere, factoryPage, factoryAttributes } from './helpers.js';
+import { SequelizeEntity } from './sequelize-entity';
+import { factoryInclude, factoryOrder, factoryWhere, factoryPage, factoryAttributes } from './helpers';
 
 export class SequelizeIndexAction implements IndexAction {
   type: Action;
