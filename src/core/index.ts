@@ -9,7 +9,7 @@ export class SharkAPI {
 
   constructor(options?: CoreOptions) {
     this.entities = [];
-    this.options = this.options || {};
+    this.options = options || {};
   }
 
   getHooks(): Array<Hook> {

@@ -127,7 +127,7 @@ export class SequelizeEntity implements EntityBase {
     return [...this.core.getHooks(), ...hooks];
   }
 
-  findHooks(trigger: HookTrigger, name: string): Array<Hook> {
+  findHooks(trigger: HookTrigger, name?: string): Array<Hook> {
     return findHooks(this.getHooks(), trigger, name);
   }
 

@@ -1,4 +1,4 @@
-import { HookRequest, findHooks, callHooks } from '../../core/hooks';
+import { HookRequest, callHooks } from '../../core/hooks';
 import { IndexAction, Relationship, Filter, Sort, Page, Action, Field } from '../index';
 import { SequelizeEntity } from './sequelize-entity';
 import { factoryInclude, factoryOrder, factoryWhere, factoryPage, factoryAttributes } from './helpers';
@@ -24,19 +24,21 @@ export class SequelizeIndexAction implements IndexAction {
   }
 
   async run(): Promise<any> {
-    let query;
+    let context = this.buildContext();
+    let totalCount = await this.entity.source.count(context);
+    let query = await this.entity.source.findAll(context);
+    query = callHooks(this.entity.findHooks('index-after'), query);
+    return { totalCount, data: query };
+  }
+
+  buildContext(): any {
     let context = { subQuery: false };
     context = factoryAttributes(this.selectedFields, context) || context;
     context = factoryInclude(this.relationships, context) || context;
     context = factoryWhere(this.filters, context) || context;
     context = factoryOrder(this.sort, context) || context;
     context = factoryPage(this.page, this.pageHooks, context) || context;
-
-    context = callHooks(findHooks(this.entity.getHooks(), 'index-before'), context);
-    let totalCount = await this.entity.source.count(context);
-    query = await this.entity.source.findAll(context);
-    query = callHooks(findHooks(this.entity.getHooks(), 'index-after'), query);
-
-    return { totalCount, data: query };
+    context = callHooks(this.entity.findHooks('index-before'), context);
+    return context;
   }
 }

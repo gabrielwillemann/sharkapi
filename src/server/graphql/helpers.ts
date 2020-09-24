@@ -64,8 +64,7 @@ export function parseRootFields(action: IndexAction | ShowAction, info: any): vo
 }
 
 export function parseRelationships(action: IndexAction | ShowAction, info: any): void {
-  let [query] = info.fieldNodes;
-  let fieldNodes = summarizeFieldNodes(query.selectionSet.selections);
+  let fieldNodes = summarizeFieldNodes(info.selectionSet.selections);
   if (action.type == 'index') {
     fieldNodes = fieldNodes.nodes;
   }

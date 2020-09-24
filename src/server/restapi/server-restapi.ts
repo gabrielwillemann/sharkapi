@@ -2,7 +2,7 @@ import { SharkAPI } from '../../core/index';
 import { ServerBase } from '../index';
 import { Error } from '../../core/error';
 import { EntityBase } from '../../orm/index';
-import { parseFilter, parsePage, parseSort, parseRelationship } from './helpers';
+import { parseFilter, parsePage, parseSort, parseRelationships } from './helpers';
 
 export class ServerRestAPI implements ServerBase {
   express: any;
@@ -29,7 +29,7 @@ export class ServerRestAPI implements ServerBase {
     this.express.get(`/${entity.name.plural.toLowerCase()}/:id`, async (req, res) => {
       try {
         let action = entity.newShowAction();
-        parseRelationship(action, req.query.include);
+        parseRelationships(action, req.query.include);
         action.id = req.params.id;
         let rows = await action.run();
         res.send(rows);
@@ -85,7 +85,7 @@ export class ServerRestAPI implements ServerBase {
     this.express.get(`/${entity.name.plural.toLowerCase()}`, async (req, res) => {
       try {
         let action = entity.newIndexAction();
-        parseRelationship(action, req.query.include);
+        parseRelationships(action, req.query.include);
         parseSort(action, req.query.sort);
         parseFilter(action, req.query.filter);
         parsePage(action, req.query.page);

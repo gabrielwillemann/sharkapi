@@ -60,7 +60,7 @@ export function parsePage(action: IndexAction, query: any): void {
   }
 }
 
-export function parseRelationship(action: IndexAction | ShowAction, query: string): void {
+export function parseRelationships(action: IndexAction | ShowAction, query: string): void {
   if (!query) return;
   if (typeof query != 'string') return;
   let includes = query.split(',');
@@ -75,8 +75,8 @@ export function parseRelationship(action: IndexAction | ShowAction, query: strin
   }
 
   let includesArray = includes.map((i) => i.split('.'));
-  let includesObj = this.summarizeQueryInclude(includesArray);
-  let relationships = this.createRelationships(includesObj);
+  let includesObj = summarizeQueryInclude(includesArray);
+  let relationships = createRelationships(includesObj);
   action.entity.findRelationshipSources(relationships);
   action.relationships = [...relationships, ...hooksRequested];
 }
@@ -84,7 +84,7 @@ export function parseRelationship(action: IndexAction | ShowAction, query: strin
 function createRelationships(query: any): Array<Relationship> {
   let result = [];
   for (let key in query) {
-    result.push({ name: key, children: this.createRelationships(query[key]) });
+    result.push({ name: key, children: createRelationships(query[key]) });
   }
   return result;
 }

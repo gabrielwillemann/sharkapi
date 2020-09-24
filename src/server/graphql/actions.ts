@@ -7,7 +7,7 @@ export async function graphQLIndexAction(entity: EntityBase, source, args, conte
     parseSort(action, args.sort);
     parseFilter(action, args.filter);
     parsePage(action, args.first, args.offset);
-    parseRelationships(action, info);
+    parseRelationships(action, info.fieldNodes[0]);
     parseRootFields(action, info);
     let rows = await action.run();
     return { nodes: rows.data, totalCount: rows.count };

@@ -11,10 +11,10 @@ export interface EntityBase {
 
   isSortable(property: string): boolean;
   isFilterable(property: string): boolean;
-  findRelationshipSources(relationships: Array<Relationship>, source?);
+  findRelationshipSources(relationships: Array<Relationship>, source?): void;
   getRelationships(): Array<Relationship>;
 
-  findHooks(trigger: HookTrigger, name: string): Array<Hook>;
+  findHooks(trigger: HookTrigger, name?: string): Array<Hook>;
   getHooks(): Array<Hook>;
 
   newIndexAction(): IndexAction;

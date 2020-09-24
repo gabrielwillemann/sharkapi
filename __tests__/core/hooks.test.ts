@@ -34,12 +34,12 @@ describe('hooks', () => {
     expect(hooksFound).toEqual([{ trigger: 'filter', match: 'name' }]);
 
     hooksFound = findHooks(hooks, 'filter', 'age');
-    expect(hooksFound).toEqual([]);
+    expect(hooksFound).toHaveLength(0);
 
     hooksFound = findHooks(hooks, 'relationship', 'person.cars');
     expect(hooksFound).toEqual([{ trigger: 'relationship', match: /^person/ }]);
 
     hooksFound = findHooks(hooks, 'relationship', 'cars.person');
-    expect(hooksFound).toEqual([]);
+    expect(hooksFound).toHaveLength(0);
   });
 });
