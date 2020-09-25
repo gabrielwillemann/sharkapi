@@ -37,9 +37,9 @@
   - (OK) REST API
   - (OK) GraphQL
   - (OK) SequelizeJs
-  - Tests
-    - https://github.com/goldbergyoni/javascript-testing-best-practices/
+  - (OK) Tests
   - Documentation
+  - Refactor some parts for reduce coupling
   - TypeOrm
   - Mongoose
   - Firebase
