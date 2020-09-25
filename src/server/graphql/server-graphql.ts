@@ -31,12 +31,12 @@ export class ServerGraphQL implements ServerBase {
     let queryFields = {};
     let mutationFields = {};
 
-    let typePageInfo = this.factoryTypePageInfo();
+    // let typePageInfo = this.factoryTypePageInfo();
     for (let entity of this.core.entities) {
       let actions = entity.options?.actions || ['index', 'show', 'create', 'update', 'delete'];
       let type = this.factoryType(entity);
       let typeInput = this.factoryTypeInput(entity);
-      this.actionQueries(queryFields, entity, actions, { type, typePageInfo });
+      this.actionQueries(queryFields, entity, actions, { type });
       this.actionMutations(mutationFields, entity, actions, { type, typeInput });
     }
 
@@ -55,9 +55,9 @@ export class ServerGraphQL implements ServerBase {
     return new this.graphql.GraphQLSchema({ query: queryType, mutation: mutationType });
   }
 
-  actionQueries(queryFields: any, entity: EntityBase, actions: Array<Action>, { type, typePageInfo }): void {
+  actionQueries(queryFields: any, entity: EntityBase, actions: Array<Action>, { type }): void {
     if (actions.includes('index')) {
-      Object.assign(queryFields, this.actionIndex(entity, { type, typePageInfo }));
+      Object.assign(queryFields, this.actionIndex(entity, { type }));
     }
     if (actions.includes('show')) {
       Object.assign(queryFields, this.actionShow(entity, { type }));
@@ -76,8 +76,8 @@ export class ServerGraphQL implements ServerBase {
     }
   }
 
-  actionIndex(entity: EntityBase, { type, typePageInfo }): any {
-    let typeConnection = this.factoryTypeConnection(entity, type, typePageInfo);
+  actionIndex(entity: EntityBase, { type }): any {
+    let typeConnection = this.factoryTypeConnection(entity, type);
     let typeSort = this.factoryTypeSort(entity);
     let typeFilter = this.factoryTypeFilter(entity);
     let typePage = this.factoryTypePage();
@@ -164,11 +164,11 @@ export class ServerGraphQL implements ServerBase {
     return type;
   }
 
-  factoryTypeConnection(entity: EntityBase, type: any, typePageInfo: any): any {
+  factoryTypeConnection(entity: EntityBase, type: any): any {
     let typeConnection = new this.graphql.GraphQLObjectType({
       name: `${pascalCase(entity.name.singular)}Connection`,
       fields: {
-        pageInfo: { type: typePageInfo },
+        // pageInfo: { type: typePageInfo },
         nodes: { type: new this.graphql.GraphQLList(type) },
         totalCount: { type: this.graphql.GraphQLInt },
       },

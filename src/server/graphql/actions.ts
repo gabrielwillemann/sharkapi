@@ -10,7 +10,7 @@ export async function graphQLIndexAction(entity: EntityBase, source, args, conte
     parseRelationships(action, info.fieldNodes[0]);
     parseRootFields(action, info);
     let rows = await action.run();
-    return { nodes: rows.data, totalCount: rows.count };
+    return { nodes: rows.data, totalCount: rows.totalCount };
   } catch (error) {
     throw new this.graphql.GraphQLError(error.message || error);
   }
@@ -20,7 +20,7 @@ export async function graphQLShowAction(entity: EntityBase, source, args, contex
   try {
     let action = entity.newShowAction();
     action.id = args.id;
-    parseRelationships(action, info);
+    parseRelationships(action, info.fieldNodes[0]);
     parseRootFields(action, info);
     let row = await action.run();
     return row;
@@ -34,7 +34,7 @@ export async function graphQLCreateAction(entity: EntityBase, source, args, cont
     let action = entity.newCreateAction();
     action.data = args.input;
     let row = await action.run();
-    return await graphQLShowAction.call(this, entity, source, { id: args.id }, context, info);
+    return await graphQLShowAction.call(this, entity, source, { id: row.id }, context, info);
   } catch (error) {
     throw new this.graphql.GraphQLError(error.message || error);
   }

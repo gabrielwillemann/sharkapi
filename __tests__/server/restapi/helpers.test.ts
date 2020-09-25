@@ -1,6 +1,6 @@
 import { Hook, HookTrigger } from '../../../src/core/hooks';
 import { CreateAction, DeleteAction, IndexAction, Relationship, ShowAction, UpdateAction } from '../../../src/orm';
-import { parseSort, parseFilter, parsePage, parseRelationship } from '../../../src/server/restapi/helpers';
+import { parseSort, parseFilter, parsePage, parseRelationships } from '../../../src/server/restapi/helpers';
 
 describe('restapi helpers', () => {
   let action: IndexAction;
@@ -60,7 +60,7 @@ describe('restapi helpers', () => {
   });
 
   test('parse relationship', () => {
-    parseRelationship(action, 'person.city.country,brand,tyres.brand');
+    parseRelationships(action, 'person.city.country,brand,tyres.brand');
     expect(action.relationships).toEqual([
       {
         name: 'person',
