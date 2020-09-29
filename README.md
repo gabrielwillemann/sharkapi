@@ -90,6 +90,10 @@ async function startSequelize() {
   City.hasMany(Person);
   Car.belongsTo(Person);
   Person.hasMany(Car);
+
+  City.sync({ force: true });
+  Person.sync({ force: true });
+  Car.sync({ force: true });
 }
 
 function startExpress() {
@@ -198,6 +202,10 @@ async function startSequelize() {
   City.hasMany(Person);
   Car.belongsTo(Person);
   Person.hasMany(Car);
+
+  City.sync({ force: true });
+  Person.sync({ force: true });
+  Car.sync({ force: true });
 }
 
 function startExpress() {
