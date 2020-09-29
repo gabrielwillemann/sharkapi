@@ -14,7 +14,12 @@
     "type": "git",
     "url": "git+https://github.com/gabrielwillemann/sharkapi.git"
   },
-  "keywords": [],
+  "keywords": [
+    "restapi",
+    "graphql",
+    "sequelize",
+    "express",
+  ],
   "author": "",
   "license": "MIT",
   "bugs": {
