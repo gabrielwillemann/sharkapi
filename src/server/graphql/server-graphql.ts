@@ -1,4 +1,4 @@
-import { pascalCase } from 'change-case';
+import { pascalCase, camelCase } from 'change-case';
 import { singular } from 'pluralize';
 
 import { SharkAPI } from '../../core/index';
@@ -87,7 +87,7 @@ export class ServerGraphQL implements ServerBase {
     if (typeFilter) args['filter'] = { type: typeFilter };
 
     return {
-      [entity.name.plural]: {
+      [camelCase(entity.name.plural)]: {
         type: typeConnection,
         args: args,
         resolve: graphQLIndexAction.bind(this, entity),
@@ -97,7 +97,7 @@ export class ServerGraphQL implements ServerBase {
 
   actionShow(entity: EntityBase, { type }): any {
     return {
-      [entity.name.singular]: {
+      [camelCase(entity.name.singular)]: {
         type: type,
         args: this.factoryFields(entity, true),
         resolve: graphQLShowAction.bind(this, entity),
