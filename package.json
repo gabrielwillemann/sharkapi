@@ -1,5 +1,5 @@
 {
-  "name": "SharkAPI",
+  "name": "sharkapi",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gabrielwillemann/SharkAPI.git"
+    "url": "git+https://github.com/gabrielwillemann/sharkapi.git"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gabrielwillemann/SharkAPI/issues"
+    "url": "https://github.com/gabrielwillemann/sharkapi/issues"
   },
-  "homepage": "https://github.com/gabrielwillemann/SharkAPI#readme",
+  "homepage": "https://github.com/gabrielwillemann/sharkapi#readme",
   "devDependencies": {
     "@types/jest": "^26.0.14",
     "jest": "^26.4.2",
